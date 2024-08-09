@@ -9,10 +9,12 @@ import Cart from './features/cart/Cart';
 import Order from './features/order/Order';
 import CreateOrder from './features/order/CreateOrder';
 import AppLayOut from './ui/AppLayOut';
+import Error from './ui/Error';
 
 const router = createBrowserRouter([
   {
     element: <AppLayOut></AppLayOut>,
+    errorElement: <Error></Error>,
     children: [
       {
         element: <Home></Home>,
@@ -22,6 +24,7 @@ const router = createBrowserRouter([
         element: <Menu></Menu>,
         path: '/menu',
         loader: MenuLoader,
+        errorElement: <Error></Error>,
       },
       {
         element: <Cart></Cart>,

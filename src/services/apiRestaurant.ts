@@ -15,7 +15,7 @@ export async function getMenu() {
 
 // export async function getOrder(id: number) {
 //     const res = await fetch(`${API_URL}/order/${id}`);
-//     if (!res.ok) throw Error(`Couldn't find order #${id}`);
+//     if (!res.ok) throw Error.tsx(`Couldn't find order #${id}`);
 //
 //     const { data } = await res.json();
 //     return data;
@@ -31,11 +31,11 @@ export async function getMenu() {
 //             },
 //         });
 //
-//         if (!res.ok) throw Error();
+//         if (!res.ok) throw Error.tsx();
 //         const { data } = await res.json();
 //         return data;
 //     } catch {
-//         throw Error('Failed creating your order');
+//         throw Error.tsx('Failed creating your order');
 //     }
 // }
 //
@@ -49,9 +49,9 @@ export async function getMenu() {
 //             },
 //         });
 //
-//         if (!res.ok) throw Error();
+//         if (!res.ok) throw Error.tsx();
 //         // We don't need the data, so we don't return anything
 //     } catch (err) {
-//         throw Error('Failed updating your order');
+//         throw Error.tsx('Failed updating your order');
 //     }
 // }
