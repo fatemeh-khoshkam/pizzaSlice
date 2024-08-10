@@ -43,8 +43,9 @@ function Order() {
 }
 
 export async function loader({ params }: LoaderFunctionArgs) {
-  console.log(params);
+  //console.log(params);
   const order = await getOrder(params.orderID);
+
   return order;
 }
 

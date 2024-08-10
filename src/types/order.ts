@@ -1,11 +1,11 @@
-type cart = {
-  addIngredients: [];
+export type cart = {
   name: string;
   pizzaId: number;
   quantity: number;
-  removeIngredients: [];
   totalPrice: number;
   unitPrice: number;
+  removeIngredients?: [];
+  addIngredients?: [];
 };
 
 export type order = {
@@ -17,4 +17,10 @@ export type order = {
   priority: boolean;
   priorityPrice: number;
   status: string;
+};
+
+export type OrderData = {
+  [key: string]: string | boolean | cart[];
+  cart: cart[];
+  priority: boolean;
 };
