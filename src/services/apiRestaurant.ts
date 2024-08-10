@@ -13,14 +13,16 @@ export async function getMenu() {
   return data as pizzaType[];
 }
 
-// export async function getOrder(id: number) {
-//     const res = await fetch(`${API_URL}/order/${id}`);
-//     if (!res.ok) throw Error.tsx(`Couldn't find order #${id}`);
-//
-//     const { data } = await res.json();
-//     return data;
-// }
-//
+export async function getOrder(id: string | undefined) {
+  if (!id) throw Error('Order ID is required');
+
+  const res = await fetch(`${API_URL}/order/${id}`);
+  if (!res.ok) throw Error(`Couldn't find order #${id}`);
+
+  const { data } = await res.json();
+  return data;
+}
+
 // export async function createOrder(newOrder) {
 //     try {
 //         const res = await fetch(`${API_URL}/order`, {
@@ -31,11 +33,11 @@ export async function getMenu() {
 //             },
 //         });
 //
-//         if (!res.ok) throw Error.tsx();
+//         if (!res.ok) throw Error();
 //         const { data } = await res.json();
 //         return data;
 //     } catch {
-//         throw Error.tsx('Failed creating your order');
+//         throw Error('Failed creating your order');
 //     }
 // }
 //
@@ -49,9 +51,9 @@ export async function getMenu() {
 //             },
 //         });
 //
-//         if (!res.ok) throw Error.tsx();
+//         if (!res.ok) throw Error();
 //         // We don't need the data, so we don't return anything
 //     } catch (err) {
-//         throw Error.tsx('Failed updating your order');
+//         throw Error('Failed updating your order');
 //     }
 // }
