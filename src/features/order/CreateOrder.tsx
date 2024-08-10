@@ -43,7 +43,9 @@ function CreateOrder() {
 
   return (
     <div>
-      <h2>Ready to order? Let's go!</h2>
+      <h2 className="bg-sky-300 text-3xl font-bold underline">
+        Ready to order? Let's go!
+      </h2>
 
       <Form method="POST">
         <div>
