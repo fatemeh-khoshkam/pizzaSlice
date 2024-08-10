@@ -1,9 +1,8 @@
 //import React from 'react';
-
-import { Form } from 'react-router-dom';
+import { Form, useNavigation, redirect, useActionData } from 'react-router-dom';
 import { cart, OrderData } from '../../types/order';
 import { createOrder } from '../../services/apiRestaurant';
-import { redirect } from 'react-router';
+import { isValidPhone } from '../../utils/isValidPhone';
 
 const fakeCart: cart[] = [
   {
@@ -29,8 +28,19 @@ const fakeCart: cart[] = [
   },
 ];
 
+type OrderErrors = {
+  phone?: string;
+};
+
 function CreateOrder() {
   const cart: cart[] = fakeCart;
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === 'submitting';
+  // We can access to whatever was returned from
+  // the action function (below) in case there was no submission.
+  const formErrors = useActionData() as OrderErrors | null;
+  console.log('error' + { formErrors });
+
   return (
     <div>
       <h2>Ready to order? Let's go!</h2>
@@ -44,6 +54,7 @@ function CreateOrder() {
         <div>
           <label>Phone number</label>
           <input type="tel" name="phone" required />
+          {formErrors?.phone && <p>{formErrors.phone}</p>}
         </div>
 
         <div>
@@ -58,7 +69,9 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <button>Order now</button>
+          <button disabled={isSubmitting}>
+            {isSubmitting ? 'Placing order....' : 'Order now'}
+          </button>
         </div>
       </Form>
     </div>
@@ -71,18 +84,28 @@ export async function action({ request }: { request: Request }) {
   console.log(data);
 
   const order: OrderData = {
-    //This takes our array of key-value pairs and converts it back into an object.
-    ...Object.fromEntries(
-      //This ensures all values are strings, even if they were originally File objects or other types.
-      Object.entries(data).map(([key, value]) => [key, value.toString()])
-    ),
+    // //This takes our array of key-value pairs and converts it back into an object.
+    // ...Object.fromEntries(
+    //   //This ensures all values are strings, even if they were originally File objects or other types.
+    //   Object.entries(data).map(([key, value]) => [key, value.toString()])
+    // ),
+    customer: data.customer.toString(),
+    phone: data.phone.toString(),
+    address: data.address.toString(),
     cart: typeof data.cart === 'string' ? JSON.parse(data.cart) : [],
     priority: data.priority === 'on',
   };
   console.log(order);
 
-  const newOrder = await createOrder(order);
+  const errors: OrderErrors = {};
 
+  if (!isValidPhone(order.phone))
+    errors.phone =
+      'Please give us your correct phone number. We might need it to contact you.';
+
+  if (Object.keys(errors).length > 0) return errors;
+
+  const newOrder = await createOrder(order);
   return redirect(`/order/${newOrder.id}`);
 }
 

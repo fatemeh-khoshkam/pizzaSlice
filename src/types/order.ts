@@ -20,7 +20,10 @@ export type order = {
 };
 
 export type OrderData = {
-  [key: string]: string | boolean | cart[];
+  //[key: string]: string | boolean | cart[];
+  customer: string;
+  phone: string;
+  address: string;
   cart: cart[];
   priority: boolean;
 };
