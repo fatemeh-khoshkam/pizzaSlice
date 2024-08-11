@@ -8,15 +8,6 @@ type initialState = {
 
 const initialState: initialState = {
   cart: [],
-  // cart: [
-  //   {
-  //     name: 'PIZZA',
-  //     pizzaId: 12,
-  //     quantity: 2,
-  //     totalPrice: 32,
-  //     unitPrice: 16,
-  //   },
-  // ],
 };
 
 const cartSlice = createSlice({
@@ -86,3 +77,8 @@ export const getTotalCartPrice = (state: RootState) =>
 export const getCart = (state: RootState) => state.cart.cart;
 
 export const getUserName = (state: RootState) => state.user.userName;
+
+export const getCurrentQuantityById =
+  (id: number) =>
+  (state: RootState): number =>
+    state.cart.cart.find((item) => item.pizzaId === id)?.quantity ?? 0;

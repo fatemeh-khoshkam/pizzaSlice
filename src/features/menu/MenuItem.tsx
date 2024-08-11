@@ -2,15 +2,16 @@
 import { formatCurrency } from '../../utils/formatCurrency';
 import { pizzaType } from '../../types/pizza';
 import Button from '../../ui/Button';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch } from '../../store';
-import { addItem } from '../../features/cart/cartSlice';
-// import { useNavigate } from 'react-router-dom';
+import { addItem, getCurrentQuantityById } from '../../features/cart/cartSlice';
+import DeleteItem from '../../features/cart/DeleteItem';
 
 function MenuItem({ pizza }: { pizza: pizzaType }) {
   const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
   const dispatch = useDispatch<AppDispatch>();
-  // const navigate = useNavigate();
+  const currentQuantity = useSelector(getCurrentQuantityById(id));
+  const isInCart: boolean = currentQuantity > 0;
 
   function handleAddToCart() {
     const newItem = {
@@ -21,7 +22,6 @@ function MenuItem({ pizza }: { pizza: pizzaType }) {
       totalPrice: unitPrice * 1,
     };
     dispatch(addItem(newItem));
-    // navigate(`/cart`);
   }
 
   return (
@@ -45,7 +45,9 @@ function MenuItem({ pizza }: { pizza: pizzaType }) {
             </p>
           )}
 
-          {!soldOut && (
+          {isInCart && <DeleteItem pizzaId={id}></DeleteItem>}
+
+          {!soldOut && !isInCart && (
             <Button type="small" onClick={handleAddToCart}>
               Add to cart
             </Button>
