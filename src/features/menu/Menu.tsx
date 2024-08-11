@@ -9,8 +9,9 @@ function Menu() {
   const menu = useLoaderData() as pizzaType[];
   console.log(menu);
 
+  //divide-stone-200 divide-y px-2
   return (
-    <ul>
+    <ul className="m-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
       {menu.map((pizza: pizzaType) => (
         <MenuItem key={pizza.id} pizza={pizza}></MenuItem>
       ))}

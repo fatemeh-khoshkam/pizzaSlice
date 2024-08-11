@@ -11,16 +11,19 @@ function AppLayOut() {
   const isLoading: 'idle' | 'loading' | 'submitting' = navigation.state;
 
   return (
-    <>
-      <Header></Header>
-      <br />
+    <div className="grid h-screen grid-rows-[auto_1fr_auto]">
       {isLoading === 'loading' && <Loader></Loader>}
-      <main>
-        <Outlet></Outlet>
-      </main>
-      <br />
+
+      <Header></Header>
+
+      <div className="overflow-scroll">
+        <main>
+          <Outlet></Outlet>
+        </main>
+      </div>
+
       <CartOverView></CartOverView>
-    </>
+    </div>
   );
 }
 
