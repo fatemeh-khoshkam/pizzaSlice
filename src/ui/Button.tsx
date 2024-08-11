@@ -1,7 +1,8 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 type ButtonProps = {
-  children: string;
+  children: React.ReactNode;
   disabled?: boolean;
   to?: string;
   type: 'primary' | 'small' | 'secondary';
