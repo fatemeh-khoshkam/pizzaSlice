@@ -1,20 +1,22 @@
 import { cart as CartState } from '../../types/order';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../../store';
 
 type initialState = {
   cart: CartState[];
 };
 
 const initialState: initialState = {
-  cart: [
-    {
-      name: 'PIZZA',
-      pizzaId: 12,
-      quantity: 2,
-      totalPrice: 32,
-      unitPrice: 16,
-    },
-  ],
+  cart: [],
+  // cart: [
+  //   {
+  //     name: 'PIZZA',
+  //     pizzaId: 12,
+  //     quantity: 2,
+  //     totalPrice: 32,
+  //     unitPrice: 16,
+  //   },
+  // ],
 };
 
 const cartSlice = createSlice({
@@ -28,7 +30,9 @@ const cartSlice = createSlice({
     deleteItem(state: initialState, action: PayloadAction<number>) {
       // deleting a pizza from list needs that pizza id, and it's the action
       // we should delete exactly that id from list (using filter method)
-      state.cart.filter((item: CartState) => item.pizzaId !== action.payload);
+      state.cart = state.cart.filter(
+        (item: CartState) => item.pizzaId !== action.payload
+      );
     },
     increaseItemQuantity(state: initialState, action: PayloadAction<number>) {
       // For increasing special pizza we want it, we should have the id of that
@@ -66,3 +70,19 @@ export const {
   clearCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;
+
+export const getTotalCartQuantity = (state: RootState) =>
+  state.cart.cart.reduce(
+    (sum: number, item: CartState) => sum + item.quantity,
+    0
+  );
+
+export const getTotalCartPrice = (state: RootState) =>
+  state.cart.cart.reduce(
+    (sum: number, item: CartState) => sum + item.totalPrice,
+    0
+  );
+
+export const getCart = (state: RootState) => state.cart.cart;
+
+export const getUserName = (state: RootState) => state.user.userName;

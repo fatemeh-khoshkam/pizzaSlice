@@ -2,9 +2,27 @@
 import { formatCurrency } from '../../utils/formatCurrency';
 import { pizzaType } from '../../types/pizza';
 import Button from '../../ui/Button';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '../../store';
+import { addItem } from '../../features/cart/cartSlice';
+// import { useNavigate } from 'react-router-dom';
 
 function MenuItem({ pizza }: { pizza: pizzaType }) {
-  const { name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
+  const { id, name, unitPrice, ingredients, soldOut, imageUrl } = pizza;
+  const dispatch = useDispatch<AppDispatch>();
+  // const navigate = useNavigate();
+
+  function handleAddToCart() {
+    const newItem = {
+      name: name,
+      pizzaId: id,
+      quantity: 1,
+      unitPrice,
+      totalPrice: unitPrice * 1,
+    };
+    dispatch(addItem(newItem));
+    // navigate(`/cart`);
+  }
 
   return (
     <li className="border-gray-100 flex gap-4 rounded-lg border p-2 shadow-md">
@@ -27,7 +45,11 @@ function MenuItem({ pizza }: { pizza: pizzaType }) {
             </p>
           )}
 
-          <Button type="small">Add to cart</Button>
+          {!soldOut && (
+            <Button type="small" onClick={handleAddToCart}>
+              Add to cart
+            </Button>
+          )}
         </div>
       </div>
     </li>
