@@ -4,12 +4,13 @@ import { OrderData } from '../../types/order';
 import { createOrder } from '../../services/apiRestaurant';
 import { isValidPhone } from '../../utils/isValidPhone';
 import Button from '../../ui/Button';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../../store';
 import { clearCart, getCart, getTotalCartPrice } from '../cart/cartSlice';
 import EmptyCart from '../cart/EmptyCart';
 import store from '../../store';
 import { formatCurrency } from '../../utils/formatCurrency';
+import { fetchAddress } from '../user/userSlice';
 
 type OrderErrors = {
   phone?: string;
@@ -27,12 +28,15 @@ function CreateOrder() {
   const totalCartPrice: number = useSelector(getTotalCartPrice);
   const priorityPrice: number = withPriority ? totalCartPrice * 0.2 : 0;
   const totalPrice: number = totalCartPrice + priorityPrice;
+  const dipatch = useDispatch<AppDispatch>();
 
   if (!cart.length) return <EmptyCart></EmptyCart>;
 
   return (
     <div className="m-auto flex flex-col px-4 py-6 sm:w-full md:w-1/2 lg:w-1/3">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
+
+      <button onClick={() => dipatch(fetchAddress())}>Get position</button>
 
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
