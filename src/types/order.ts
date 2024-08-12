@@ -26,4 +26,5 @@ export type OrderData = {
   address: string;
   cart: cart[];
   priority: boolean;
+  position: string;
 };

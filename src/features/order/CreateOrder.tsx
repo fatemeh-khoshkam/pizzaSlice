@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Form, useNavigation, redirect, useActionData } from 'react-router-dom';
 import { OrderData } from '../../types/order';
 import { createOrder } from '../../services/apiRestaurant';
@@ -17,7 +17,13 @@ type OrderErrors = {
 };
 
 function CreateOrder() {
-  const username = useSelector((state: RootState) => state.user.userName);
+  const {
+    userName,
+    status: addressStatus,
+    position,
+    address,
+    error: errorAddress,
+  } = useSelector((state: RootState) => state.user);
   const cart = useSelector(getCart);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
@@ -28,7 +34,13 @@ function CreateOrder() {
   const totalCartPrice: number = useSelector(getTotalCartPrice);
   const priorityPrice: number = withPriority ? totalCartPrice * 0.2 : 0;
   const totalPrice: number = totalCartPrice + priorityPrice;
-  const dipatch = useDispatch<AppDispatch>();
+  const isLoadingAddress = addressStatus === 'loading';
+  const dispatch = useDispatch<AppDispatch>();
+
+  function handleGetPosition(e: React.MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    dispatch(fetchAddress());
+  }
 
   if (!cart.length) return <EmptyCart></EmptyCart>;
 
@@ -36,14 +48,12 @@ function CreateOrder() {
     <div className="m-auto flex flex-col px-4 py-6 sm:w-full md:w-1/2 lg:w-1/3">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
 
-      <button onClick={() => dipatch(fetchAddress())}>Get position</button>
-
       <Form method="POST">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sm:basis-40">First Name</label>
           <input
             className="input grow"
-            defaultValue={username}
+            defaultValue={userName}
             type="text"
             name="customer"
             required
@@ -62,16 +72,34 @@ function CreateOrder() {
           </div>
         </div>
 
-        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative mb-5 flex flex-col gap-2 sm:flex-row sm:items-center">
           <label className="sm:basis-40">Address</label>
           <div className="grow">
             <input
+              disabled={isLoadingAddress}
               className="input w-full"
               type="text"
               name="address"
+              defaultValue={address}
               required
             />
+            {addressStatus === 'error' && (
+              <p className="bg-red-100 text-red-700 mt-2 rounded-md p-2 text-xs">
+                {errorAddress}
+              </p>
+            )}
           </div>
+          {!position.latitude && !position.longitude && (
+            <span className="absolute right-[3px] top-[3px]">
+              <Button
+                disabled={isLoadingAddress}
+                type="small"
+                onClick={handleGetPosition}
+              >
+                Get position
+              </Button>
+            </span>
+          )}
         </div>
 
         <div className="mb-12 flex items-center gap-5">
@@ -90,7 +118,18 @@ function CreateOrder() {
 
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
-          <Button disabled={isSubmitting} type="primary">
+
+          <input
+            type="hidden"
+            name="position"
+            value={
+              position.longitude && position.latitude
+                ? `${position.latitude},${position.longitude}`
+                : ''
+            }
+          />
+
+          <Button disabled={isSubmitting || isLoadingAddress} type="primary">
             {isSubmitting
               ? 'Placing order....'
               : `Order now for ${formatCurrency(totalPrice)}`}
@@ -110,6 +149,7 @@ export async function action({ request }: { request: Request }) {
     customer: data.customer.toString(),
     phone: data.phone.toString(),
     address: data.address.toString(),
+    position: data.position.toString(),
     cart: typeof data.cart === 'string' ? JSON.parse(data.cart) : [],
     priority: data.priority === 'true',
   };
