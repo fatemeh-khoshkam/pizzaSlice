@@ -1,35 +1,15 @@
-//import React from 'react';
+import { useState } from 'react';
 import { Form, useNavigation, redirect, useActionData } from 'react-router-dom';
-import { cart, OrderData } from '../../types/order';
+import { OrderData } from '../../types/order';
 import { createOrder } from '../../services/apiRestaurant';
 import { isValidPhone } from '../../utils/isValidPhone';
 import Button from '../../ui/Button';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-
-const fakeCart: cart[] = [
-  {
-    pizzaId: 12,
-    name: 'Mediterranean',
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: 'Vegetale',
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    pizzaId: 11,
-    name: 'Spinach and Mushroom',
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
+import { clearCart, getCart, getTotalCartPrice } from '../cart/cartSlice';
+import EmptyCart from '../cart/EmptyCart';
+import store from '../../store';
+import { formatCurrency } from '../../utils/formatCurrency';
 
 type OrderErrors = {
   phone?: string;
@@ -37,16 +17,21 @@ type OrderErrors = {
 
 function CreateOrder() {
   const username = useSelector((state: RootState) => state.user.userName);
-  const cart: cart[] = fakeCart;
+  const cart = useSelector(getCart);
   const navigation = useNavigation();
   const isSubmitting = navigation.state === 'submitting';
+  const [withPriority, setWithPriority] = useState<boolean>(false);
   // We can access to whatever was returned from
   // the action function (below) in case there was no submission.
   const formErrors = useActionData() as OrderErrors | null;
-  console.log('error' + { formErrors });
+  const totalCartPrice: number = useSelector(getTotalCartPrice);
+  const priorityPrice: number = withPriority ? totalCartPrice * 0.2 : 0;
+  const totalPrice: number = totalCartPrice + priorityPrice;
+
+  if (!cart.length) return <EmptyCart></EmptyCart>;
 
   return (
-    <div className="px-4 py-6">
+    <div className="m-auto flex flex-col px-4 py-6 sm:w-full md:w-1/2 lg:w-1/3">
       <h2 className="mb-8 text-xl font-semibold">Ready to order? Let's go!</h2>
 
       <Form method="POST">
@@ -91,8 +76,8 @@ function CreateOrder() {
             type="checkbox"
             name="priority"
             id="priority"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            checked={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority" className="font-medium">
             Want to yo give your order priority?
@@ -102,7 +87,9 @@ function CreateOrder() {
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <Button disabled={isSubmitting} type="primary">
-            {isSubmitting ? 'Placing order....' : 'Order now'}
+            {isSubmitting
+              ? 'Placing order....'
+              : `Order now for ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
       </Form>
@@ -116,16 +103,11 @@ export async function action({ request }: { request: Request }) {
   console.log(data);
 
   const order: OrderData = {
-    // //This takes our array of key-value pairs and converts it back into an object.
-    // ...Object.fromEntries(
-    //   //This ensures all values are strings, even if they were originally File objects or other types.
-    //   Object.entries(data).map(([key, value]) => [key, value.toString()])
-    // ),
     customer: data.customer.toString(),
     phone: data.phone.toString(),
     address: data.address.toString(),
     cart: typeof data.cart === 'string' ? JSON.parse(data.cart) : [],
-    priority: data.priority === 'on',
+    priority: data.priority === 'true',
   };
   console.log(order);
 
@@ -138,6 +120,7 @@ export async function action({ request }: { request: Request }) {
   if (Object.keys(errors).length > 0) return errors;
 
   const newOrder = await createOrder(order);
+  store.dispatch(clearCart());
   return redirect(`/order/${newOrder.id}`);
 }
 
