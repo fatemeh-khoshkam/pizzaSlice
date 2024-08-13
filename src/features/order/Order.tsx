@@ -6,8 +6,21 @@ import { calcMinutesLeft } from '../../utils/calcMinutesLeft';
 import { formatDate } from '../../utils/formatDate';
 import { order, cart } from '../../types/order';
 import OrderItem from './OrderItem';
+//import { pizzaType } from '../../types/pizza';
 
 function Order() {
+  const order = useLoaderData() as order;
+
+  //LATER
+  //const menuFetcher = useFetcher()
+  // useEffect(
+  //   function () {
+  //     if (!menuFetcher.data && menuFetcher.state === 'idle')
+  //       menuFetcher.load('/menu');
+  //   },
+  //   [menuFetcher]
+  // );
+
   const {
     id,
     cart,
@@ -16,10 +29,12 @@ function Order() {
     priorityPrice,
     orderPrice,
     estimatedDelivery,
-  } = useLoaderData() as order;
+  } = order;
+
   const deliveryIn = calcMinutesLeft(estimatedDelivery);
-  //console.log(order);
-  // Test ID: IIDSAT
+
+  // const isLoadingIngredients =
+  //   menuFetcher.state === 'loading' || !menuFetcher.data;
 
   return (
     <div className="space-y-8 px-4 py-6">
@@ -51,7 +66,15 @@ function Order() {
 
       <ul className="dive-stone-200 divide-y border-b border-t">
         {cart.map((item: cart) => (
-          <OrderItem item={item} key={item.pizzaId} />
+          <OrderItem
+            item={item}
+            key={item.pizzaId}
+            // isLoadingIngredients={isLoadingIngredients}
+            // ingredients={
+            //   menuFetcher?.data?.find((el: pizzaType) => el.id === item.pizzaId)
+            //     ?.ingredients ?? []
+            // }
+          />
         ))}
       </ul>
 

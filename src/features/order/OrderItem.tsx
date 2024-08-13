@@ -1,7 +1,13 @@
 import { formatCurrency } from '../../utils/formatCurrency';
 import { cart } from '../../types/order';
 
-function OrderItem({ item }: { item: cart }) {
+type OrderItemProps = {
+  item: cart;
+  // isLoadingIngredients: boolean;
+  // ingredients: string[];
+};
+
+function OrderItem({ item }: OrderItemProps) {
   const { quantity, name, totalPrice } = item;
 
   return (
@@ -12,6 +18,14 @@ function OrderItem({ item }: { item: cart }) {
         </p>
         <p className="font-bold">{formatCurrency(totalPrice)}</p>
       </div>
+      {/*<p className="text-stone-500 text-sm capitalize italic">*/}
+      {/* */}
+      {/*  {isLoadingIngredients*/}
+      {/*    ? 'Loading ingredients...'*/}
+      {/*    : ingredients.length > 0*/}
+      {/*      ? ingredients.join(', ')*/}
+      {/*      : 'No ingredients information available'}*/}
+      {/*</p>*/}
     </li>
   );
 }

@@ -7,7 +7,6 @@ import Loader from '../ui/Loader';
 
 function AppLayOut() {
   const navigation = useNavigation();
-  console.log(navigation);
   const isLoading: 'idle' | 'loading' | 'submitting' = navigation.state;
 
   return (
